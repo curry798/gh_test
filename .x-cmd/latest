@@ -1,0 +1,43 @@
+# shellcheck shell=sh disable=SC3043
+
+main(){
+    local pkgname="${1:?"provide package name"}"
+    sh ./"${pkgname}"
+}
+
+
+build_init(){
+    export path_bk="${PATH}"
+    export X_BUILD_DIR=x-cmd-build
+    mkdir -p "${HOME}"/"${X_BUILD_DIR}"/
+    export PATH="${HOME}"/"${X_BUILD_DIR}"/bin:"${path_bk}"
+    export LD_LIBRARY_PATH="${HOME}"/"${X_BUILD_DIR}"/lib:/usr/lib:"${LD_LIBRARY_PATH}"
+    export CPATH="${HOME}"/"${X_BUILD_DIR}"/include:/usr/local/include:"${CPATH}"
+    export LIBRARY_PATH="${HOME}"/"${X_BUILD_DIR}"/lib:"${HOME}"/"${X_BUILD_DIR}"/lib64:/usr/lib:"${LIBRARY_PATH}"
+    export PREFIX="${HOME}"/"${X_BUILD_DIR}"
+    export PKG_CONFIG_PATH="${HOME}"/"${X_BUILD_DIR}"/lib/pkgconfig:"${PKG_CONFIG_PATH}"
+}
+
+gcc_set(){
+    local tmp="${1:-gcc}"
+    if [ "${tmp}" = "zig" ];then
+        export CC="zig gcc"
+        export CXX="zig g++"
+        export AR="zig ar"
+        export RANLIB="zig ranlib"
+        export LD=ld
+        export STRIP=stripa
+    else
+        export CC=gcc
+        export CXX=g++
+        export AR=ar
+        export RANLIB=ranlib
+        export LD=ld
+        export STRIP=stripa
+    fi
+
+}
+
+
+build_init
+apt install -y gcc g++ make automake autoconf libtool pkg-config curl

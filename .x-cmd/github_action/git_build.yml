@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        brew install gcc g++ make automake autoconf libtool pkg-config curl
+
+    - name: Build
+      run: |
+        . latest && . git_2.43.0/build.sh
+
+
+    # - name: Store artifacts
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: compiled-files
+    #     path: /path/to/compiled/files

@@ -1,0 +1,70 @@
+# shellcheck shell=sh disable=SC3043
+
+x log init build
+___x_cmd_build_environment(){
+    export path_bk="${PATH}"
+    export X_BUILD_DIR=x-cmd-build
+    mkdir -p "${HOME}"/"${X_BUILD_DIR}"/
+    export PREFIX="${HOME}"/"${X_BUILD_DIR}"
+
+    export PATH="${path_bk}":"${PREFIX}"/bin
+    export LD_LIBRARY_PATH=/lib:/usr/lib:"${PREFIX}"/lib"${LD_LIBRARY_PATH:+":$LD_LIBRARY_PATH"}"
+    export CPATH=/include:/usr/include/:/usr/local/include:"${PREFIX}"/include"${CPATH:+":${CPATH}"}"
+    export LIBRARY_PATH="${PREFIX}"/lib64:/usr/lib:"${PREFIX}"/lib"${LIBRARY_PATH:+":${LIBRARY_PATH}"}"
+    export PKG_CONFIG_PATH="${PREFIX}"/lib/pkgconfig"${PKG_CONFIG_PATH:+":${PKG_CONFIG_PATH}"}"
+}
+
+build(){
+    local app="$1"
+    local version="$2"
+    [ -n "${version}" ] || version="$(x yq e ."${app}".latest ./.x-cmd/lib_list.yml)"
+    
+    if [ -z "${version}" ] || [ "${version}" = "null" ];then
+        build:error "$app find version fail, version: ${version}"
+        return 1
+    fi
+
+    x yq e ".[\"$app\"][\"$version\"]" .x-cmd/lib_list.yml | ___x_cmd_build_lib || {
+        return 1
+    }
+    (
+        build:info "build ${app},version ${version}"
+        cd "${app}" && {
+            ____X_CMD_IS_APP="true" version="${version}" PREFIX="${PREFIX}/${app}" . ./build.sh
+        }
+    )
+}
+
+___x_cmd_build_lib(){
+    while read -r ___X_CMD_APP_LIB;do
+        local lib_name="${___X_CMD_APP_LIB%%": "*}"
+        local lib_version="${___X_CMD_APP_LIB##*": "}"
+        local lib_list
+        lib_list="$(x yq e ".[\"$lib_name\"][\"$lib_version\"]" .x-cmd/lib_list.yml)"
+
+        if [ -z "${lib_list}" ] && [ ! -f "${lib_name}"/check ];then
+            build:info "build ${lib_name},version ${lib_version}"
+            version="${lib_version}" . "${lib_name}"/build.sh || {
+                build:error "build ${lib_name} fail, version: ${lib_version}"
+                return 1
+            }
+            printf "%s" "${lib_name}" >> "${lib_name}"/check
+        elif [ "${lib_list}" = "null" ];then
+            [ -z "${lib_name}" ] || build:warn "yq find ${lib_name} fail"
+            continue
+        else
+            printf "%s\n" "${lib_list}" | ___x_cmd_build_lib || return 1
+            [ -f "${lib_name}"/check ] || {
+                build:info "build ${lib_name},version ${lib_version}"
+                version="${lib_version}" . "${lib_name}"/build.sh || {
+                    build:error "build ${lib_name} fail, version: ${lib_version}"
+                    return 1
+                }
+                printf "%s" "${lib_name}" >> "${lib_name}"/check
+            }
+        fi
+    done
+    
+}
+
+___x_cmd_build_environment
