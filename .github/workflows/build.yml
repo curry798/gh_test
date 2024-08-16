@@ -8,10 +8,10 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    # env:
-    #   github_token: ${{ secrets.GITHUB_TOKEN }}
-    #   git_user: curry798
-    #   git_email: huangshengtao@x-cmd.com
+    env:
+      github_token: ${{ secrets.TOKEN }}
+      git_user: curry798
+      git_email: huangshengtao@x-cmd.com
 
     steps:
     - name: main
