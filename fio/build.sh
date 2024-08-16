@@ -12,6 +12,6 @@
             ./configure --build-static --prefix="${PREFIX}"
         fi
         make
-        make DESTDIR="${PREFIX}" install
+        make install
     }
 )
