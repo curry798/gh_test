@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - build_git
+
+jobs:
+  build:
+    runs-on: macos-latest
+    env:
+      github_token: ${{ secrets.GITHUB_TOKEN }}
+      git_user: curry798
+      git_email: huangshengtao@x-cmd.com
+
+    steps:
+    - name: main
+      uses: x-cmd/action@main
+      with:
+        code: |
+          brew install gcc make automake autoconf libtool pkg-config curl
+          . latest
+          ( x cd git_2.43.0; . build.sh)
+          ( x cd ~/x-cmd-build/bin; otool -L ./* ) 
+          command cd; x zuz z git.tar.gz x-cmd-build
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: git
+        path: ~/git.tar.gz
