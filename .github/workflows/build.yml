@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - build_git
+      - main
 
 jobs:
   build:
