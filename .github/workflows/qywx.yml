@@ -1,18 +1,19 @@
 name: qywx
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
-  build:
+  send_msg:
     runs-on: ubuntu-lates
+    timeout-minutes: 20
     env:
       qywx_webhook: ${{ secrets.QYWX_WEBHOOK }}
 
     steps:
     - name: main
       uses: x-cmd/action@main
-
       with:
-        run: |
-          x qywx --cfg webhook=$qywx_webhook
+        code: |
+          x qywx --cfg webhook='${{ secrets.WEBHOOK_URL }}'
           x qywx send aa
