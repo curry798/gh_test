@@ -9,7 +9,9 @@ jobs:
     timeout-minutes: 20
     env:
       qywx_webhook: ${{ secrets.QYWX_WEBHOOK }}
-
+      github_token: ${{ secrets.TOKEN }}
+      git_user: curry798
+      git_email: huangshengtao@x-cmd.com
     steps:
     - name: main
       uses: x-cmd/action@main
