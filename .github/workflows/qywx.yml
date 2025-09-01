@@ -1,4 +1,4 @@
-name: CI with WeChat Work Notification
+name: qywx
 
 on:
   workflow_dispatch:
@@ -10,7 +10,16 @@ jobs:
       - name: main
         env:
           QYWX_WEBHOOK: ${{ secrets.QYWX_WEBHOOK }}
+          JOB_STATUS: ${{ job.status }}
         run: |
           eval "$(curl https://get.x-cmd.com)"
+
+          if [ "$JOB_STATUS" = "success" ]; then
+            TITLE="✅ 发布成功"
+          else
+            TITLE="❌ 发布失败"
+          fi
+
+          MESSAGE="## $TITLE"
           x qywx --cfg webhook='${{ secrets.QYWX_WEBHOOK }}'
-          x qywx send aa
+          x qywx send --markdown "$MESSAGE"
