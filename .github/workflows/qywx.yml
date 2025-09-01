@@ -15,16 +15,15 @@ jobs:
           eval "$(curl https://get.x-cmd.com)"
 
           if [ "$JOB_STATUS" = "success" ]; then
-            TITLE="✅ x-cmd 新版本发布成功"
+            TITLE="✅   x-cmd 新版本发布成功"
           else
-            TITLE="❌ x-cmd 新版本发布失败"
+            TITLE="❌   x-cmd 新版本发布失败"
           fi
 
-          MESSAGE="## $TITLE <@all>
-          已安装 **x-cmd** 的用户，快使用 `x upgrade` 升级吧！
+          MESSAGE="## $TITLE
+          已安装 **x-cmd** 的用户，快使用 '`x upgrade`' 升级吧！ <@all>
           >官网: [https://x-cmd.com](https://x-cmd.com)
-          >Github: [github.com/x-cmd/x-cmd](https://github.com/x-cmd/x-cmd)
-          ![x-cmd](https://codeberg.org/curry798/tea/raw/branch/main/og.png)"
+          >Github: [github.com/x-cmd/x-cmd](https://github.com/x-cmd/x-cmd)"
           
           x qywx --cfg webhook='${{ secrets.QYWX_WEBHOOK }}'
           x qywx send --markdown "$MESSAGE"
