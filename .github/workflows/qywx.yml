@@ -1,18 +1,16 @@
-name: qywx
+name: CI with WeChat Work Notification
 
 on:
   workflow_dispatch:
 
 jobs:
-  send_msg:
+  qywx:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      QYWX_WEBHOOK: ${{ secrets.QYWX_WEBHOOK }}
     steps:
-    - name: main
-      uses: x-cmd/action@main
-      with:
-        code: |
+      - name: main
+        env:
+          QYWX_WEBHOOK: ${{ secrets.QYWX_WEBHOOK }}
+        run: |
+          eval "$(curl https://get.x-cmd.com)"
           x qywx --cfg webhook='${{ secrets.QYWX_WEBHOOK }}'
           x qywx send aa
