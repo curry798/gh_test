@@ -1,0 +1,17 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: main
+        env:
+          QYWX_WEBHOOK: ${{ secrets.QYWX_WEBHOOK }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          sleep 50s
+          eval "$(curl https://get.x-cmd.com)"
+          
